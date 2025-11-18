@@ -56,7 +56,7 @@ def relatorio_mensal(usuario, senha, formato, metadado):
     # EXECUÇÃO DA ROTINA
     # -------------------------------
     print("identificando tela de rotinas do promax")
-    while janela_contem_texto("Promax 12.17.00.00 - 008-0001-R IMARUI LESTE DIST. E LOGISTICA LTDA.", "PromaxWEB") is not True:
+    while janela_contem_texto(["Promax 12.17.00.00 - 008-0001-R IMARUI LESTE DIST. E LOGISTICA LTDA.", "cadastramentos", "controle", "estoque", "B2B", "OBZ"], "PromaxWEB") is not True:
         time.sleep(0.1)
         print("tentando novamente...")
     print("tela de rotinas identificada...")
