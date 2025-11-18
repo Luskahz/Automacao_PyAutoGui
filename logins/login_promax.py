@@ -26,6 +26,7 @@ def validar_tela_login(timeout=60, intervalo=1):
     print("🌐 Abrindo Edge...")
     while janela_contem_texto("Login de Usuario", "PromaxWeb") is not True:
         print("aguardando abrir a janela do edge")
+        time.sleep(1)
     print("janela do edge aberta")
 
     wins = [w for w in gw.getWindowsWithTitle("Edge") if w.visible]

@@ -69,6 +69,7 @@ def relatorio_mensal(usuario, senha, formato, metadado):
     inserir_datas(metadado["data_inicio"], metadado["data_final"])
     metadado["sequencia_data_ate_final"]()
     while janela_aberta("Processando") is not False:
+        time.sleep(0.01)
         print("processando")
     # -------------------------------
     # EXPORTAÇÃO E RENOMEAÇÃO
@@ -120,6 +121,7 @@ def arquivo_diario(usuario, senha, formato, metadado, datas):
     inserir_datas(metadado["datas"]["d1"], metadado["datas"]["d1"])
     metadado["sequencia_data_ate_final"]()
     while janela_contem_texto(["Arquivo", "gerado","sucesso"], metadado["janelas_popup"][1]) is not True:
+        time.sleep(2)
         print("aguardando gerar o arquivo")
     pyautogui.press('enter')
     fechar_janelas(metadado["janelas_popup"][1])
