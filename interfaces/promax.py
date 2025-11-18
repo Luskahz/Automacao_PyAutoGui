@@ -98,17 +98,13 @@ def arquivo_diario(usuario, senha, formato, metadado, datas):
     # -------------------------------
     if formato == "especifico":
         login_promax(usuario, senha)
-        for _ in range(5):
-            pyautogui.press("tab")
 
     # -------------------------------
     # EXECUÇÃO DA ROTINA
     # -------------------------------
     print("identificando tela de rotinas do promax")
-    inicio_promax = janela_contem_texto("Promax 12.17.00.00 - 008-0001-R IMARUI LESTE DIST. E LOGISTICA LTDA.", "PromaxWEB")
-    while inicio_promax is not True:
-        time.sleep(0.2)
-        inicio_promax = janela_contem_texto("Promax 12.17.00.00 - 008-0001-R IMARUI LESTE DIST. E LOGISTICA LTDA.", "PromaxWEB")
+    while janela_contem_texto("Promax 12.17.00.00 - 008-0001-R IMARUI LESTE DIST. E LOGISTICA LTDA.", "PromaxWEB") is not True:
+        time.sleep(0.1)
         print("tentando novamente...")
     print("tela de rotinas identificada...")
     acessar_rotina(metadado["rotina"])
