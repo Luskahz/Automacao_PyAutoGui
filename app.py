@@ -67,7 +67,7 @@ if __name__ == "__main__":
 
             elif formato == "especifico":
                 try:
-                    especifico(formato)
+                    especifico(formato, None)
                 except Exception as e:
                     print("\n❌ Erro durante a execução da rotina específica:")
                     print(e)
