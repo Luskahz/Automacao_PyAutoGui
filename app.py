@@ -1,95 +1,114 @@
-import schedule, time, os
+import schedule
+import time
+import os
+import threading
+from queue import Queue
+
 from formatos_atualizacao.automatico import automatico
 from formatos_atualizacao.especifico import especifico
+
+
+# ======================================================
+# FILA CENTRAL E WORKER ÚNICO
+# ======================================================
+
+fila = Queue()
+executando = False
+
+
+def worker():
+    global executando
+
+    while True:
+        tarefa = fila.get()   
+        formato, base = tarefa
+
+        executando = True
+        try:
+            if formato == "automatico":
+                automatico(formato)
+            else:
+                especifico(formato, base)
+        except Exception as e:
+            print(f"\n❌ Erro executando tarefa [{formato} | {base}]: {e}")
+        finally:
+            executando = False
+            fila.task_done()
+
+
+
+threading.Thread(target=worker, daemon=True).start()
+
+
+# ======================================================
+# FUNÇÕES UTILITÁRIAS
+# ======================================================
+
+def enfileirar_tarefa(formato, base=None):
+    """Coloca qualquer tarefa na fila única."""
+    fila.put((formato, base))
+    print(f"\n📌 Tarefa '{formato} {base}' adicionada à fila.")
+
+
+def run_scheduler():
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+
+# ======================================================
+# SCHEDULER
+# ======================================================
+
+schedule.every().day.at("07:30").do(enfileirar_tarefa, "automatico")
+schedule.every(15).minutes.do(enfileirar_tarefa, "especifico", "03_11_40")
+schedule.every(60).minutes.do(enfileirar_tarefa, "especifico", "03_01_47_01")
+threading.Thread(target=run_scheduler, daemon=True).start()
+
+
+# ======================================================
+# MENU
+# ======================================================
 
 def exibir_menu():
     os.system('cls' if os.name == 'nt' else 'clear')
     print("\n===========================================")
-    print("Iniciando processo de atualização dos dados do SQL...")
+    print("Processo de atualização dos dados do SQL")
     print("===========================================")
     print("Bases que serão atualizadas:")
-    print("03_11_40 -----------------------> M0")
-    print("03_02_24 -----------------------> M0")
-    print("03_02_37_operacão_veiculo_mapa -> M0")
-    print("03_05_30_clientes --------------> M0")
-    print("03_05_30_mensal ----------------> M0")
-    print("03_11_29 -----------------------> M0")
-    print("03_08_05 -----------------------> M0")
-    print("Bees deliver -------------------> D1 e D0")
-    print("Relatorio Roteirizador ---------> D1")
-    print("QLP ----------------------------> D1")
+    print("03_11_40, 03_02_24, 03_02_37, ...")
     print("")
-    print("Configurações de atualização:")
+    print("Configurações:")
     print("[1][auto] - Automática")
     print("[2][espec] - Por base específica")
-    print("[0][sair] - Sair")
-
-def automacao(formato, base=None):
-    match formato:
-        case "automatico":
-            try:
-                automatico(formato)
-            except Exception as e:
-                print("\n❌ Erro durante a execução da rotina automática:\n" + e)
-
-        case "especifico":
-            try:
-                especifico(formato, base)
-            except Exception as e:
-                print("\n❌ Erro durante a execução da rotina especifica:\n" + e)
-    
-
-
+    print("[0] - Sair")
 
 
 if __name__ == "__main__":
+    aliases = {
+        "1": "automatico",
+        "auto": "automatico",
+        "2": "especifico",
+        "espec": "especifico",
+    }
+
     while True:
-        try:
-            exibir_menu()
-            formato_raw = input("Selecione o formato de atualização: ").strip().lower()
+        exibir_menu()
+        formato_raw = input("Selecione: ").strip().lower()
+        formato = aliases.get(formato_raw, formato_raw)
 
-            aliases = {
-                "1": "automatico",
-                "auto": "automatico",
-                "2": "especifico",
-                "espec": "especifico",
-            }
+        if formato == "automatico":
+            enfileirar_tarefa("automatico")
 
-            formato = aliases.get(formato_raw, formato_raw)
+        elif formato == "especifico":
+            base = input("Qual base? ").strip()
+            enfileirar_tarefa("especifico", base)
 
+        elif formato in ("0", "sair", "exit", "quit"):
+            print("Encerrando...")
+            break
 
-            if formato == "automatico":
-                try:
-                    automatico(formato)
-                except Exception as e:
-                    print("\n❌ Erro durante a execução da rotina automática:")
-                    print(e)
-
-            elif formato == "especifico":
-                try:
-                    especifico(formato, None)
-                except Exception as e:
-                    print("\n❌ Erro durante a execução da rotina específica:")
-                    print(e)
-
-            elif formato in ("0", "sair", "exit", "quit"):
-                print("\nEncerrando...")
-                break
-
-            else:
-                print("❌ Opção inválida, tente novamente.")
-
-        except Exception as e:
-            print("\n⚠️ Erro inesperado, mas o programa continuará rodando:")
-            print(e)
+        else:
+            print("❌ Opção inválida.")
 
         input("\nPressione Enter para voltar ao menu...")
-
-
-schedule.every().day.at("07:30").do(automacao, "automatico")
-schedule.every(15).minutes.do(automacao, "especifico", "03_11_40")
-schedule.every(60).minutes.do(automacao, "especifico", "03_01_47_01")
-
-while True:
-    schedule.run_pending()
-    time.sleep(5)
