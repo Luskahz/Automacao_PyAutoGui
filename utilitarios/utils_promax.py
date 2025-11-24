@@ -54,9 +54,9 @@ def exportar_csv(janela):
         pyautogui.press('tab')
     pyautogui.press('enter')
     texto_concluido= [ "concluído.", "concluido", "concludo", "Abrir", "conclude"]
-    texto_pendente = [match_progresso, "baixados", "s restantes"]
-    time.sleep(2)
-    while janela_contem_texto(texto_concluido, janela) is not True and janela_contem_texto(texto_pendente, janela) is True:
+    texto_pendente = [match_progresso, "baixado", "s restantes", "srestantes", "restantes", "restante", "cancelar"]
+    #while janela_contem_texto(texto_concluido, janela) is not True and janela_contem_texto(texto_pendente, janela) is True:
+    while janela_contem_texto(texto_pendente, janela) is True:
         print("Aguardando download da base")
     for _ in range(19):
         pyautogui.press('tab')
@@ -194,7 +194,6 @@ def movimentacao_arquivo_sql(nome_pos_promax, agora: datetime, metadado):
     print(f"🔎 Procurando arquivo: {original}")
     print("chegou aqui, esperando 10s")
     inicio_espera = time.time()
-    
     while not os.path.exists(original): #espera 30 segundos o arquivo ser salvo no downloads, se n for ele breka
         if time.time() - inicio_espera > 30:
             print("⚠️ Timeout: arquivo ainda não apareceu no diretório de downloads.")
@@ -252,8 +251,8 @@ def janela_contem_texto(texto_procurado, nome_janela: str) -> bool:
     # --- OCR ---
     texto_ocr = pytesseract.image_to_string(img, lang="eng")
     texto_normalizado = unidecode(texto_ocr.lower())
-    
-
+    print("texto na tela: ")
+    print(texto_normalizado)
     # --- normalizar entrada ---
     if isinstance(texto_procurado, str):
         textos = [texto_procurado]       
