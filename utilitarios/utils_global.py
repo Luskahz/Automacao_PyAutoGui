@@ -1,8 +1,15 @@
-import pyautogui, time, calendar, re
+import pyautogui, time, calendar, re, shutil, os
 from datetime import datetime, timedelta
 from utilitarios.utils_promax import(
     write_lower
 )
+
+
+MESES = {
+        1: "janeiro", 2: "fevereiro", 3: "março", 4: "abril",
+        5: "maio", 6: "junho", 7: "julho", 8: "agosto",
+        9: "setembro", 10: "outubro", 11: "novembro", 12: "dezembro"
+    }
 
 
 def metadados_03_02_24(agora: datetime):
@@ -342,11 +349,8 @@ MAPA_ROTINAS = {
         ],
     },
 
-    # Por enquanto esses ainda não têm metadados com fluxo de pyautogui,
-    # então mantive só nomes_alternativos. Quando você criar metadados_bees_deliver,
-    # é só adicionar o "metadado": metadados_bees_deliver aqui.
     "bees_deliver": {
-        "metadados": metadados_bees_deliver,
+        "metadado": metadados_bees_deliver,
         "nomes_alternativos": [
             "bees", "beesdeliver", "bees_deliver",
             "bees-deliver", "bdlvr",
@@ -426,5 +430,26 @@ def obter_metadados(busca: str) -> dict | None:
 
     agora = datetime.now()
     metadados = fn_metadado(agora)       
-
+    print(metadados)
     return metadados
+
+
+def movimentacao_arquivo_sql(nome_arquivo, caminho_origem, caminho_destino):
+    """
+    Procura um arquivo exato em `caminho_origem`
+    e move para `caminho_destino`.
+
+    Retorna True se moveu, False se não encontrou.
+    """
+
+    os.makedirs(caminho_destino, exist_ok=True)
+
+    origem = os.path.join(caminho_origem, nome_arquivo)
+    destino = os.path.join(caminho_destino, nome_arquivo)
+
+    if not os.path.isfile(origem):
+        return False
+
+    # Move o arquivo
+    shutil.move(origem, destino)
+    return True

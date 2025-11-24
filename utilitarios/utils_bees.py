@@ -1,4 +1,4 @@
-import subprocess, json, time, os 
+import subprocess, json, time, os, base64 
 from playwright.sync_api import sync_playwright
 
 
@@ -98,4 +98,48 @@ def capturar_token_bees():
             json.dump(dados, f, indent=4, ensure_ascii=False)
 
         print("Token e cabeçalhos salvos em tokens/bees.json")
+
+
+
+def token_bees_valido(caminho="tokens/bees.json"):
+    try:
+        with open(caminho, "r", encoding="utf-8") as f:
+            dados = json.load(f)
+
+        auth = dados["request_headers"].get("Authorization", "")
+
+        if not auth.startswith("Bearer "):
+            return False 
+
+        token = auth.split(" ")[1] 
+
+        partes = token.split(".")
+        if len(partes) != 3:
+            return False
+
+        payload_b64 = partes[1]
+
+        padding = len(payload_b64) % 4
+        if padding != 0:
+            payload_b64 += "=" * (4 - padding)
+
+        payload_json = json.loads(base64.urlsafe_b64decode(payload_b64))
+
+        exp = payload_json.get("exp")
+        if exp is None:
+            return False
+
+
+        agora = int(time.time())
+
+
+        return agora < exp
+
+    except Exception as e:
+        print("Erro ao validar token:", e)
+        return False
+
+
+
+
 

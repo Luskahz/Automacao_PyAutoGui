@@ -24,8 +24,9 @@ def identificar_interface(metadado, formato) -> str | None:
                     senha_promax = os.getenv("senha_promax")
                     promax(metadado, usuario_promax, senha_promax, formato)
                 case "bees_deliver":
-                    #implementar puxar usuario e senha do bees
-                    bees_deliver()
+                    usuario_bees_deliver = os.getenv("usuario_bees_deliver")
+                    senha_bees_deliver = os.getenv("senha_bees_deliver")
+                    bees_deliver(metadado,usuario_bees_deliver, senha_bees_deliver, formato)
 
         case "automatico":
             match metadado["interface"]:
