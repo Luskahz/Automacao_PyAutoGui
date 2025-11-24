@@ -232,6 +232,60 @@ def metadados_03_08_05(agora: datetime):
     }
 
 
+
+def metadados_01_20_11(agora: datetime):
+    def sequencia_inicio_ate_data():
+        time.sleep(2)
+        pyautogui.press('tab')
+        pyautogui.press('tab')
+
+    def sequencia_data_ate_exportacao():
+        for _ in range(7):
+            pyautogui.press('tab')
+        pyautogui.press('enter')
+
+    return {
+        "rotina": "03_11_40",
+        "interface": "promax",
+        "periodo": "mensal",
+        "caminho_sql": r"Distribuição Urbana\rotinas\03_11_40",
+        "data_inicio": agora.replace(day=1).strftime("%d/%m/%Y"),
+        "data_final": datetime(
+            agora.year,
+            agora.month,
+            calendar.monthrange(agora.year, agora.month)[1]
+        ).strftime("%d/%m/%Y"),
+        "janelas_popup": ["Downloads", "Rel. Tempos e Movimentos MPD", "PromaxWeb"],
+        "sequencia_inicio_ate_data": sequencia_inicio_ate_data,
+        "sequencia_data_ate_final": sequencia_data_ate_exportacao,
+    }
+
+def metadados_bees_deliver(agora: datetime):
+
+    return {
+        "rotina": "bees_deliver",
+        "interface": "bees_deliver",
+        "dias_periodo": 2,
+        "periodo": "diario",
+        "caminho_sql": r"Distribuição Urbana\rotinas\bees_deliver_dia",
+        "datas": {
+            "d1": (
+                (agora - timedelta(days=2))
+                if agora.weekday() == 0
+                else (agora - timedelta(days=1))
+            ).strftime("%Y-%m-%d"),
+
+            "d0": agora.strftime("%Y-%m-%d")
+        },
+        "nome_exportacao": "routes-data_",
+        "janelas_popup": ["Downloads", "BEES Deliver portal"]
+    }
+
+
+
+
+
+
 MAPA_ROTINAS = {
     "03_11_40": {
         "metadado": metadados_03_11_40,
@@ -292,6 +346,7 @@ MAPA_ROTINAS = {
     # então mantive só nomes_alternativos. Quando você criar metadados_bees_deliver,
     # é só adicionar o "metadado": metadados_bees_deliver aqui.
     "bees_deliver": {
+        "metadados": metadados_bees_deliver,
         "nomes_alternativos": [
             "bees", "beesdeliver", "bees_deliver",
             "bees-deliver", "bdlvr",

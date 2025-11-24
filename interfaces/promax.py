@@ -99,17 +99,13 @@ def arquivo_diario(usuario, senha, formato, metadado, datas):
     # -------------------------------
     if formato == "especifico":
         login_promax(usuario, senha)
-        for _ in range(5):
-            pyautogui.press("tab")
 
     # -------------------------------
     # EXECUÇÃO DA ROTINA
     # -------------------------------
     print("identificando tela de rotinas do promax")
-    inicio_promax = janela_contem_texto("Promax 12.17.00.00 - 008-0001-R IMARUI LESTE DIST. E LOGISTICA LTDA.", "PromaxWEB")
-    while inicio_promax is not True:
-        time.sleep(0.2)
-        inicio_promax = janela_contem_texto("Promax 12.17.00.00 - 008-0001-R IMARUI LESTE DIST. E LOGISTICA LTDA.", "PromaxWEB")
+    while janela_contem_texto("Promax 12.17.00.00 - 008-0001-R IMARUI LESTE DIST. E LOGISTICA LTDA.", "PromaxWEB") is not True:
+        time.sleep(0.1)
         print("tentando novamente...")
     print("tela de rotinas identificada...")
     acessar_rotina(metadado["rotina"])
@@ -170,4 +166,52 @@ def arquivo_diario(usuario, senha, formato, metadado, datas):
     fechar_janelas(metadado["janelas_popup"])
 
     print(f"✅ Extração {metadado['rotina']} concluída com sucesso.")
+
+def relatorio_cadastral(usuario, senha, formato, metadado):
+    agora = datetime.now()
+    nome_pos_promax = f"{MESES[agora.month]}_{metadado["rotina"]}.{EXT}"
+
+    # -------------------------------
+    # LOGIN
+    # -------------------------------
+    if formato == "especifico":
+        login_promax(usuario, senha)
+
+
+    # -------------------------------
+    # EXECUÇÃO DA ROTINA
+    # -------------------------------
+    print("identificando tela de rotinas do promax")
+    while janela_contem_texto("Promax 12.17.00.00 - 008-0001-R IMARUI LESTE DIST. E LOGISTICA LTDA.", "PromaxWEB") is not True:
+        time.sleep(0.1)
+        print("tentando novamente...")
+    print("tela de rotinas identificada...")
+    acessar_rotina(metadado["rotina"])
+    while janela_aberta(f"{usuario}"+" - "+f"{usuario}") is not True:
+        time.sleep(0.3)
+        print("abrindo formulario")
+    print("formulário rotina carregado")
+    metadado["sequencia_inicio_ate_data"]()
+    inserir_datas(metadado["data_inicio"], metadado["data_final"])
+    metadado["sequencia_data_ate_final"]()
+    while janela_aberta("Processando") is not False:
+        print("processando")
+    # -------------------------------
+    # EXPORTAÇÃO E RENOMEAÇÃO
+    # -------------------------------
+
+    while janela_contem_texto(["csv", "osv", "salvar", "anterior"], metadado["janelas_popup"][1]) is not True:
+        time.sleep(1)
+        print("procurando o botão de salvar CSV")
+    exportar_csv(metadado["janelas_popup"][1])
+    renomear_arquivo(nome_pos_promax)
+
+    # -------------------------------
+    # MOVIMENTAÇÃO E LIMPEZA
+    # -------------------------------
+    movimentacao_arquivo_sql(nome_pos_promax, agora, metadado)
+    fechar_janelas(metadado["janelas_popup"])
+
+    print(f"✅ Extração {metadado["rotina"]} concluída com sucesso.")
+
 

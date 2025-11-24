@@ -25,6 +25,7 @@ def validar_tela_login(timeout=60, intervalo=1):
     subprocess.Popen(["start", "msedge", URL_PROMAX], shell=True)
     print("🌐 Abrindo Edge...")
     while janela_contem_texto("Login de Usuario", "PromaxWeb") is not True:
+        time.sleep(0.1)
         print("aguardando abrir a janela do edge")
         time.sleep(1)
     print("janela do edge aberta")
